@@ -31,6 +31,7 @@
     "express-fileupload": "^1.5.2",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.0",
-    "prisma": "^6.6.0"
+    "prisma": "^6.6.0",
+    "streamifier": "^0.1.1"
   }
 }
