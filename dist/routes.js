@@ -25,8 +25,7 @@ const isAuthenticated_1 = require("./middlewares/isAuthenticated");
 const multer_2 = __importDefault(require("./config/multer"));
 const router = (0, express_1.Router)();
 exports.router = router;
-// const upload = multer(uploadConfig.upload("./tmp"))
-const upload = (0, multer_1.default)(multer_2.default.upload());
+const upload = (0, multer_1.default)(multer_2.default.upload("./tmp"));
 // -- ROTAS USER --
 router.post('/users', new CreateUserController_1.CreateUserController().handle);
 router.post('/session', new AuthUserController_1.AuthUserController().handle);
@@ -36,10 +35,7 @@ router.post('/category', isAuthenticated_1.isAuthenticated, new CreateCategoryCo
 router.get('/category', isAuthenticated_1.isAuthenticated, new ListCategoryController_1.ListCategoryController().handle);
 // -- ROTAS PRODUCT
 // router.post('/product', isAuthenticated, upload.single('file'), new CreateProductController().handle)
-// router.post('/product', isAuthenticated, new CreateProductController().handle)
-// -- ROTAS PRODUCT ✅ COM UPLOAD
-router.post('/product', isAuthenticated_1.isAuthenticated, upload.single('file'), // 👈 Agora multer processa o arquivo
-new CreateProductController_1.CreateProductController().handle);
+router.post('/product', isAuthenticated_1.isAuthenticated, new CreateProductController_1.CreateProductController().handle);
 router.get('/category/product', isAuthenticated_1.isAuthenticated, new ListByCategoryController_1.ListByCategoryController().handle);
 // -- ROTAS ORDER
 router.post('/order', isAuthenticated_1.isAuthenticated, new CreateOrderController_1.CreateOrderController().handle);
