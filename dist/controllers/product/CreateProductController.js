@@ -27,34 +27,41 @@ cloudinary_1.v2.config({
 class CreateProductController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { name, price, description, category_id } = req.body;
-            // Se o multer não receber arquivo, retorna erro
-            if (!req.file) {
-                throw new Error("Nenhum arquivo enviado");
-            }
-            // 🔥 Envia para Cloudinary usando stream
-            const resultFile = yield new Promise((resolve, reject) => {
-                const uploadStream = cloudinary_1.v2.uploader.upload_stream({ folder: "products" }, // 👈 opcional: cria uma pasta no Cloudinary
-                (error, result) => {
-                    if (error) {
-                        reject(error);
-                    }
-                    else {
-                        resolve(result);
-                    }
+            try {
+                const { name, price, description, category_id } = req.body;
+                console.log("📥 req.body:", req.body);
+                console.log("📥 req.file:", req.file);
+                // ✅ verifica se o arquivo chegou
+                if (!req.file) {
+                    return res.status(400).json({ error: "Nenhum arquivo enviado" });
+                }
+                // ✅ envia para Cloudinary usando stream
+                const resultFile = yield new Promise((resolve, reject) => {
+                    const uploadStream = cloudinary_1.v2.uploader.upload_stream({ folder: "products" }, (error, result) => {
+                        if (error) {
+                            reject(error);
+                        }
+                        else {
+                            resolve(result);
+                        }
+                    });
+                    streamifier_1.default.createReadStream(req.file.buffer).pipe(uploadStream);
                 });
-                streamifier_1.default.createReadStream(req.file.buffer).pipe(uploadStream);
-            });
-            // Cria o produto com a URL do Cloudinary
-            const createProductService = new CreateProductService_1.CreateProductService();
-            const product = yield createProductService.execute({
-                name,
-                price,
-                description,
-                banner: resultFile.secure_url, // 🔥 usa o link seguro do Cloudinary
-                category_id
-            });
-            return res.json(product);
+                // ✅ cria produto no banco
+                const createProductService = new CreateProductService_1.CreateProductService();
+                const product = yield createProductService.execute({
+                    name,
+                    price,
+                    description,
+                    banner: resultFile.secure_url,
+                    category_id
+                });
+                return res.json(product);
+            }
+            catch (err) {
+                console.error("❌ ERRO AO CRIAR PRODUTO:", err);
+                return res.status(500).json({ error: "Erro interno ao criar produto" });
+            }
         });
     }
 }
